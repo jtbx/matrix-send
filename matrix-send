@@ -1,0 +1,138 @@
+#!/bin/sh
+# matrix-send: a super-simple command-line matrix client
+
+[ -e /usr/bin/curl ] || printf "\033[31;1merror:\033[0m curl not found\n"
+
+###########################
+#### Generic Functions ####
+###########################
+
+error () {
+	printf "\033[31;1merror:\033[0m $1\n"
+	exit 1
+}
+
+conf_error () {
+	printf "\033[31;1mconfiguration error:\033[0m $1\n"
+	exit 2
+}
+
+vargrep () {
+	printf "$2\n" | grep "$1" $3
+}
+
+##################################
+#### Configuration Directives ####
+##################################
+
+Homeserver () {
+	[ -z $1 ] && conf_error "Homeserver not specified in directive Homeserver"
+	homeserver="$1"
+}
+
+Username () {
+	[ -z $1 ] && conf_error "Username not specified in directive Username"
+	username="$1"
+}
+
+Password () {
+	[ -z $1 ] && conf_error "Password not specified in directive Password"
+	password="$1"
+}
+
+AccessToken () {
+	[ -z $1 ] && conf_error "Token not specified in directive AccessToken"
+	manualAuth="true"
+	token="$1"
+}
+
+CacheLocation () {
+	[ -z $1 ] && conf_error "Cache Location not specified in directive CacheLocation"
+	if vargrep "^/.+$" "$1" -Eq || \
+		vargrep "^~.+$" "$1" -Eq;
+	then cacheloc="$1";
+	else conf_error "Cache Location is not valid (does not begin with / or ~) in directive CacheLocation"; fi
+}
+
+##################################
+#### Configuration Statements ####
+##################################
+
+Color () {
+	color="true"
+}
+
+NoCache () {
+	nocache="true"
+}
+
+###################################
+#### Matrix-specific Functions ####
+###################################
+
+GetAccessToken () {
+	[ -z "$manualAuth" ] && printf "Getting access token...\n"
+	if [ "$manualAuth" = "true" ];
+	then printf ""; # printf "" basically means do nothing
+	else token=$(curl -XPOST -d "{"'"'"type"'"'":"'"'"m.login.password"'"'", "'"'"user"'"'":"'"'"$username"'"'", "'"'"password"'"'":"'"'"$password"'"'"}" "https://$homeserver/_matrix/client/r0/login" | grep -oE 'syt_.+_...................._......');
+	fi
+}
+
+CacheAccessToken () {
+	if [ "$nocache" = "true" ];
+	then printf "";
+	else
+		mkdir -p "$cacheloc/matrix-send"
+		printf "$token\n" > "$cacheloc/matrix-send/access-token";
+	fi
+}
+
+ClearCache () {
+	[ -e "$cacheloc/matrix-send/access-token" ] || printf "There is no cache to be cleared.\n"
+	[ -e "$cacheloc/matrix-send/access-token" ] && rm -rf "$cacheloc/matrix-send/" && printf "Cleared cache\n"
+	exit 0
+}
+
+Send () {
+	curl -XPOST -d "{"'"'"msgtype"'"'":"'"'"m.text"'"'", "'"'"body"'"'":"'"'"$message"'"'"}" "https://$homeserver/_matrix/client/r0/rooms/%21$roomid/send/m.room.message?access_token=$token"
+}
+
+###############################
+#### Configuration loading ####
+###############################
+
+# Set default config settings
+CacheLocation "$HOME/.cache"
+
+# Load configuration
+if [ -e $HOME/.config/matrix-send.conf ]; 
+then . $HOME/.config/matrix-send.conf;
+else
+	mkdir -p $HOME/.config
+	touch $HOME/.config/matrix-send.conf
+fi
+
+# Run checks for essential directives
+[ -z $homeserver ] && conf_error "Homeserver directive is not present"
+[ -z $username ] && conf_error "Username directive is not present"
+[ -z $password ] && conf_error "Password directive is not present"
+
+##############
+#### Main ####
+##############
+
+[ -z "$1" ] && error "Message not specified"
+
+# Get token and cache it (unless NoCache is set)
+[ "$1" = "-c" ] && ClearCache
+[ -e "$cacheloc/matrix-send/access-token" ] && token=$(cat $cacheloc/matrix-send/access-token)
+[ -e "$cacheloc/matrix-send/access-token" ] || GetAccessToken
+CacheAccessToken
+
+if [ -z "$2" ];
+then error "Room ID not specified (Leave out the '!').";
+else
+	message="$1"
+	roomid="$2"
+	Send;
+fi
