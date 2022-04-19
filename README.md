@@ -47,6 +47,8 @@ After you've finished changing these, your configuration should look like this (
 
 After you have these three directives set, you're ready to start.
 
+Additional directives can be found in [config.md](https://github.com/jtbx/matrix-send/blob/main/config.md).
+
 ---
 
 To install, run `sudo make install` in the cloned repository's directory.
