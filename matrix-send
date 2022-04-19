@@ -36,8 +36,8 @@ Username () {
 }
 
 Password () {
-	[ -z $1 ] && conf_error "Password not specified in directive Password"
-	password="$1"
+	[ -z "$1" ] && conf_error "Password not specified in directive Password"
+	password="$*"
 }
 
 AccessToken () {
@@ -111,7 +111,7 @@ fi
 # Run checks for essential directives
 [ -z $homeserver ] && conf_error "Homeserver directive is not present"
 [ -z $username ] && conf_error "Username directive is not present"
-[ -z $password ] && conf_error "Password directive is not present"
+[ -z "$password" ] && conf_error "Password directive is not present"
 
 ##############
 #### Main ####
