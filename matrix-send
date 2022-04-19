@@ -58,11 +58,6 @@ CacheLocation () {
 #### Configuration Statements ####
 ##################################
 
-Colour () {
-	colour="true"
-}
-alias Color="Colour"
-
 NoCache () {
 	nocache="true"
 }

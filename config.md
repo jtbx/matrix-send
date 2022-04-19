@@ -19,5 +19,4 @@ Options you can modify with an argument.
 
 Options that say one thing and nothing else. You can't change these.
 
-* `Colour`/`Color`: Use colour
 * `NoCache`: Don't cache access tokens
