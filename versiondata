@@ -1,3 +1,1 @@
-# This is used by matrix-send when given the -u option, to upgrade.
-
 LatestVersion="dev_rolling"
