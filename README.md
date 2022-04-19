@@ -13,7 +13,9 @@ A script to send a message to a Matrix room.
 
 If you don't understand, `matrix-send` is an oversimplified Matrix client.
 
-It is designed for automation, for example you could set a cron job for `matrix-send "$(curl ifconfig.co)" yourmatrixroom:matrix.org` and that would automatically send your device's public IP address to a Matrix room. It seems like doxxing yourself, but I use it for ssh'ing into my home server when I'm somewhere else.
+It is mainly designed for automation. I use it on my Matrix room.
+
+`matrix-send` doesn't have support for end-to-end encryption, and never will.
 
 ## Get started
 
