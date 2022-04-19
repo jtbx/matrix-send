@@ -9,7 +9,7 @@ A script to send a message to a Matrix room.
 
 ---
 
-`matrix-send` is a simple script to interact with a Matrix homeserver in order to send a message to a room hosted by it.
+`matrix-send` is a simple script to interact with a Matrix homeserver in order to send a message to a room.
 
 If you don't understand, `matrix-send` is an oversimplified Matrix client.
 
