@@ -1,6 +1,8 @@
 #!/bin/sh
 # matrix-send: a super-simple command-line matrix client
 
+Version="dev_rolling"
+
 [ -e /usr/bin/curl ] || printf "\033[31;1merror:\033[0m curl not found\n"
 
 ###########################
@@ -12,9 +14,7 @@ error () {
 	exit 1
 }
 
-conf_error () {
-	printf "\033[31;1mconfiguration error:\033[0m $1\n"
-	exit 2
+conf_error () { printf "\033[31;1mconfiguration error:\033[0m $1\n" exit 2
 }
 
 vargrep () {
@@ -62,9 +62,9 @@ NoCache () {
 	nocache="true"
 }
 
-###################################
-#### Matrix-specific Functions ####
-###################################
+############################
+#### Specific Functions ####
+############################
 
 GetAccessToken () {
 	[ -z "$manualAuth" ] && printf "Getting access token...\n"
@@ -118,9 +118,9 @@ fi
 ##############
 
 [ -z "$1" ] && error "Message not specified"
+[ "$1" = "-c" ] && ClearCache
 
 # Get token and cache it (unless NoCache is set)
-[ "$1" = "-c" ] && ClearCache
 [ -e "$cacheloc/matrix-send/access-token" ] && token=$(cat $cacheloc/matrix-send/access-token)
 [ -e "$cacheloc/matrix-send/access-token" ] || GetAccessToken
 CacheAccessToken
